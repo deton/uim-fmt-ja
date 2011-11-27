@@ -99,6 +99,8 @@
     line))
 
 (define (foldim-string-as-utf8->list str)
-  (with-char-codec "UTF-8"
-    (lambda ()
-      (string->list str))))
+  (string->list
+    (with-char-codec "UTF-8"
+      (lambda ()
+        (let ((u8str (string-copy str)))
+          (%%string-reconstruct! u8str))))))
