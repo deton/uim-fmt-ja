@@ -33,8 +33,8 @@
 
 (register-im
  'fmt
- ""
- "UTF-8"
+ "ja"
+ "EUC-JP"
  fmt-im-name-label
  fmt-im-short-desc
  #f
@@ -66,14 +66,14 @@
     (if (string? str)
       (im-commit pc
         (list->string
-          (reverse! (fmt-on-list () (fmt-string-as-utf8->list str))))))))
+          (reverse! (fmt-on-list () (fmt-string-as-euc-jp->list str))))))))
 
 (define (fmt-on-clipboard pc)
   (let ((str (fmt-acquire-text pc 'clipboard)))
     (if (string? str)
       (im-commit pc
         (list->string
-          (reverse! (fmt-on-list () (fmt-string-as-utf8->list str))))))))
+          (reverse! (fmt-on-list () (fmt-string-as-euc-jp->list str))))))))
 
 (define (fmt-on-list res src)
   (define (make-line line src)
@@ -86,6 +86,7 @@
         (make-line (cons #\space line) (cdr src))) ; XXX: not add in Japanese
       (else
         (make-line (cons (car src) line) (cdr src)))))
+  ;(writeln src)
   (if (null? src)
     res
     (receive (line src) (make-line () src)
@@ -98,8 +99,8 @@
     0
     line))
 
-(define (fmt-string-as-utf8->list str)
-  (string->list
-    (with-char-codec "UTF-8"
-      (lambda ()
+(define (fmt-string-as-euc-jp->list str)
+  (with-char-codec "EUC-JP"
+    (lambda ()
+      (string->list
         (%%string-reconstruct! (string-copy str))))))
