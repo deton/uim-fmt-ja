@@ -102,5 +102,4 @@
   (string->list
     (with-char-codec "UTF-8"
       (lambda ()
-        (let ((u8str (string-copy str)))
-          (%%string-reconstruct! u8str))))))
+        (%%string-reconstruct! (string-copy str))))))
