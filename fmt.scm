@@ -65,15 +65,15 @@
   (let ((str (fmt-acquire-text pc 'selection)))
     (if (string? str)
       (im-commit pc
-        (list->string
-          (reverse! (fmt-on-list () (fmt-string-as-euc-jp->list str))))))))
+        (string-list-concat
+          (fmt-on-list () (reverse (string-to-list str))))))))
 
 (define (fmt-on-clipboard pc)
   (let ((str (fmt-acquire-text pc 'clipboard)))
     (if (string? str)
       (im-commit pc
-        (list->string
-          (reverse! (fmt-on-list () (fmt-string-as-euc-jp->list str))))))))
+        (string-list-concat
+          (fmt-on-list () (reverse (string-to-list str))))))))
 
 (define (fmt-on-list res src)
   (define (make-line line src)
@@ -81,9 +81,9 @@
       ((null? src)
         (values line src))
       ((>= (fmt-width line) fmt-fold-width)
-        (values (cons #\newline line) src)) ; TODO: inhibit ",." on top
-      ((char=? (car src) #\newline)
-        (make-line (cons #\space line) (cdr src))) ; XXX: not add in Japanese
+        (values (cons "\n" line) src)) ; TODO: inhibit ",." on top
+      ((string=? (car src) "\n")
+        (make-line (cons " " line) (cdr src))) ; XXX: not add in Japanese
       (else
         (make-line (cons (car src) line) (cdr src)))))
   ;(writeln src)
@@ -94,13 +94,17 @@
 
 (define (fmt-width line)
   ;; TODO: support tab char
-  ;; TODO: support multibyte halfwidth char
-  (fold (lambda (x sum) (+ sum (if (< (char->integer x) 128) 1 2)))
+  (fold
+    (lambda (x sum) (+ sum (if (< (fmt-euc-jp-string->ichar x) 128) 1 2)))
     0
     line))
 
-(define (fmt-string-as-euc-jp->list str)
-  (with-char-codec "EUC-JP"
-    (lambda ()
-      (string->list
-        (%%string-reconstruct! (string-copy str))))))
+(define (fmt-euc-jp-string->ichar s)
+  (let ((sl (with-char-codec "EUC-JP"
+              (lambda ()
+                (string->list s)))))
+    (cond
+      ((null? sl)
+        0)
+      (else
+        (char->integer (car sl))))))
