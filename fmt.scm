@@ -1,48 +1,48 @@
-;;; IM to fold line on selection or clipboard.
+;;; IM to format selection or clipboard like fmt command.
 
 (require-extension (srfi 1 2 8))
-(require-custom "foldim-custom.scm")
+(require-custom "fmt-custom.scm")
 
-(define foldim-context-rec-spec context-rec-spec)
-(define-record 'foldim-context foldim-context-rec-spec)
-(define foldim-context-new-internal foldim-context-new)
+(define fmt-context-rec-spec context-rec-spec)
+(define-record 'fmt-context fmt-context-rec-spec)
+(define fmt-context-new-internal fmt-context-new)
 
-(define foldim-context-new
+(define fmt-context-new
   (lambda args
-    (let ((pc (apply foldim-context-new-internal args)))
+    (let ((pc (apply fmt-context-new-internal args)))
       pc)))
 
-(define foldim-init-handler
+(define fmt-init-handler
   (lambda (id im arg)
-    (let ((pc (foldim-context-new id im)))
+    (let ((pc (fmt-context-new id im)))
       pc)))
 
-(define (foldim-key-press-handler pc key key-state)
+(define (fmt-key-press-handler pc key key-state)
   (if (ichar-control? key)
     (im-commit-raw pc)
     (cond
-      ((foldim-selection-key? key key-state)
-        (foldim-on-selection pc))
-      ((foldim-clipboard-key? key key-state)
-        (foldim-on-clipboard pc))
+      ((fmt-selection-key? key key-state)
+        (fmt-on-selection pc))
+      ((fmt-clipboard-key? key key-state)
+        (fmt-on-clipboard pc))
       (else
         (im-commit-raw pc)))))
 
-(define (foldim-key-release-handler pc key state)
+(define (fmt-key-release-handler pc key state)
   (im-commit-raw pc))
 
 (register-im
- 'foldim
+ 'fmt
  ""
  "UTF-8"
- foldim-im-name-label
- foldim-im-short-desc
+ fmt-im-name-label
+ fmt-im-short-desc
  #f
- foldim-init-handler
+ fmt-init-handler
  #f
  context-mode-handler
- foldim-key-press-handler
- foldim-key-release-handler
+ fmt-key-press-handler
+ fmt-key-release-handler
  #f
  #f
  #f
@@ -54,33 +54,33 @@
  #f
  )
 
-(define (foldim-acquire-text pc id)
+(define (fmt-acquire-text pc id)
   (and-let*
     ((ustr (im-acquire-text pc id 'beginning 0 'full))
      (latter (ustr-latter-seq ustr)))
     (and (pair? latter)
          (car latter))))
 
-(define (foldim-on-selection pc)
-  (let ((str (foldim-acquire-text pc 'selection)))
+(define (fmt-on-selection pc)
+  (let ((str (fmt-acquire-text pc 'selection)))
     (if (string? str)
       (im-commit pc
         (list->string
-          (reverse! (foldim-on-list () (foldim-string-as-utf8->list str))))))))
+          (reverse! (fmt-on-list () (fmt-string-as-utf8->list str))))))))
 
-(define (foldim-on-clipboard pc)
-  (let ((str (foldim-acquire-text pc 'clipboard)))
+(define (fmt-on-clipboard pc)
+  (let ((str (fmt-acquire-text pc 'clipboard)))
     (if (string? str)
       (im-commit pc
         (list->string
-          (reverse! (foldim-on-list () (foldim-string-as-utf8->list str))))))))
+          (reverse! (fmt-on-list () (fmt-string-as-utf8->list str))))))))
 
-(define (foldim-on-list res src)
+(define (fmt-on-list res src)
   (define (make-line line src)
     (cond
       ((null? src)
         (values line src))
-      ((>= (foldim-width line) foldim-fold-width)
+      ((>= (fmt-width line) fmt-fold-width)
         (values (cons #\newline line) src)) ; TODO: inhibit ",." on top
       ((char=? (car src) #\newline)
         (make-line (cons #\space line) (cdr src))) ; XXX: not add in Japanese
@@ -89,16 +89,16 @@
   (if (null? src)
     res
     (receive (line src) (make-line () src)
-      (foldim-on-list (append line res) src))))
+      (fmt-on-list (append line res) src))))
 
-(define (foldim-width line)
+(define (fmt-width line)
   ;; TODO: support tab char
   ;; TODO: support multibyte halfwidth char
   (fold (lambda (x sum) (+ sum (if (< (char->integer x) 128) 1 2)))
     0
     line))
 
-(define (foldim-string-as-utf8->list str)
+(define (fmt-string-as-utf8->list str)
   (string->list
     (with-char-codec "UTF-8"
       (lambda ()
