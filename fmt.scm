@@ -1,6 +1,6 @@
 ;;; IM to format selection or clipboard like fmt command.
 
-(require-extension (srfi 1 2 8))
+(require-extension (srfi 1 2))
 (require-custom "fmt-custom.scm")
 
 (define fmt-context-rec-spec context-rec-spec)
@@ -79,9 +79,10 @@
   (define (make-line line src)
     (cond
       ((null? src)
-        (values line src))
+        (fmt-on-list (append line res) src))
       ((>= (fmt-width line) fmt-fold-width)
-        (values (cons "\n" line) src)) ; TODO: inhibit ",." on top
+        ;; TODO: inhibit ",." on top
+        (fmt-on-list (append (cons "\n" line) res) src))
       ((string=? (car src) "\n")
         (make-line (cons " " line) (cdr src))) ; XXX: not add in Japanese
       (else
@@ -89,8 +90,7 @@
   ;(writeln src)
   (if (null? src)
     res
-    (receive (line src) (make-line () src)
-      (fmt-on-list (append line res) src))))
+    (make-line () src)))
 
 (define (fmt-width line)
   ;; TODO: support tab char
