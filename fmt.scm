@@ -124,9 +124,15 @@
 
 (define (fmt-fold-line line)
   (define (make-line line0 line)
-    (if (>= (fmt-width line0) fmt-fold-width)
-      (values (reverse line0) line)
-      (make-line (cons (car line) line0) (cdr line))))
+    (let ((width (fmt-width line0)))
+      (if (>= width fmt-fold-width)
+        (receive
+          (last-word rest)
+          (break fmt-str1-whitespace? line0)
+          ;; TODO: line0 with no whitespace
+          (values (reverse (drop-while fmt-str1-whitespace? rest))
+                  (append (reverse last-word) line)))
+        (make-line (cons (car line) line0) (cdr line)))))
   (make-line '() line))
 ;; TODO
 
