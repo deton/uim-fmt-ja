@@ -124,6 +124,18 @@
 
 (define (fmt-ja-fold-line line)
   (define (make-line line0 line)
+    (define (fold-line-latin line0 line)
+      (receive
+        (last-word rest)
+        (break fmt-ja-str1-whitespace? line0)
+        (if (null? rest) ; no whitespace?
+          ;; TODO: japanese boundary
+          (make-line (cons (car line) line0) (cdr line)) ; do not fold line
+          (values (reverse (drop-while fmt-ja-str1-whitespace? rest))
+                  (append (reverse last-word) line)))))
+    (define (fold-line-ja line0 line)
+      (values (reverse (cdr line0)) ; TODO: support KINSOKU
+              (cons (car line0) line)))
     (cond
       ((null? line)
         (if (null? line0)
@@ -131,15 +143,8 @@
           (values (reverse line0) line)))
       ((> (fmt-ja-width line0) fmt-ja-fold-width)
         (if (fmt-ja-str1-wide? (car line0))
-          (values (reverse (cdr line0)) ; TODO: support KINSOKU
-                  (cons (car line0) line))
-          (receive
-            (last-word rest)
-            (break fmt-ja-str1-whitespace? line0)
-            (if (null? rest) ; no whitespace?
-              (make-line (cons (car line) line0) (cdr line)) ; do not fold line
-              (values (reverse (drop-while fmt-ja-str1-whitespace? rest))
-                      (append (reverse last-word) line))))))
+          (fold-line-ja line0 line)
+          (fold-line-latin line0 line)))
       (else
         (make-line (cons (car line) line0) (cdr line)))))
   (make-line '() line))
