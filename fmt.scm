@@ -92,7 +92,11 @@
         (receive
           (line0 rest)
           (fmt-fold-line line)
-          (fmt-line-list (cons line0 res-lines) (cons rest src-lines))))
+          (fmt-line-list
+            (cons line0 res-lines)
+            (if (null? rest)
+              src-lines ; avoid to add non-exist empty line
+              (cons rest src-lines)))))
       ((or (null? src-lines)
            (fmt-new-paragraph? (car src-lines)))
         (fmt-line-list (cons line res-lines) src-lines))
@@ -111,7 +115,6 @@
 (define (fmt-join-lines line1 line2)
   (let* ((l1rev (drop-while fmt-str1-whitespace? (reverse line1)))
          (l2 (drop-while fmt-str1-whitespace? line2)))
-    (writeln (list l1rev l2))
     (if (or (null? l1rev)
             (null? l2)
             (fmt-str1-wide? (car l1rev))
