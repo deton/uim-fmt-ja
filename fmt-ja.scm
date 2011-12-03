@@ -127,9 +127,12 @@
     (define (fold-line-latin line0 line)
       (receive
         (last-word rest)
-        (break fmt-ja-str1-whitespace? line0)
+        (break
+          (lambda (x)
+            (or (fmt-ja-str1-whitespace? x)
+                (fmt-ja-str1-wide? x)))
+          line0)
         (if (null? rest) ; no whitespace?
-          ;; TODO: japanese boundary
           (make-line (cons (car line) line0) (cdr line)) ; do not fold line
           (values (reverse (drop-while fmt-ja-str1-whitespace? rest))
                   (append (reverse last-word) line)))))
