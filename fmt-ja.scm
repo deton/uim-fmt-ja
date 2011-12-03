@@ -143,7 +143,6 @@
       (else
         (make-line (cons (car line) line0) (cdr line)))))
   (make-line '() line))
-;; TODO
 
 (define (fmt-width line)
   ;; TODO: support tab char
@@ -155,6 +154,7 @@
 (define (fmt-str1-wide? str1)
   (let ((char (fmt-euc-jp-string->char str1)))
     (and char
+         ;; TODO: support HALFWIDTH KATAKANA
          (>= (char->integer char) 128))))
 
 (define (fmt-str1-whitespace? str1)
