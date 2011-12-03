@@ -1,26 +1,26 @@
 (require "i18n.scm")
 
-(define fmt-im-name-label (N_ "fmt"))
-(define fmt-im-short-desc (N_ "format selection or clipboard like fmt command"))
+(define fmt-ja-im-name-label (N_ "fmt-ja"))
+(define fmt-ja-im-short-desc (N_ "format selection or clipboard like fmt command"))
 
-(define-custom-group 'fmt
-                     fmt-im-name-label
-                     fmt-im-short-desc)
+(define-custom-group 'fmt-ja
+                     fmt-ja-im-name-label
+                     fmt-ja-im-short-desc)
 
-(define-custom 'fmt-fold-width 70
-  '(fmt)
+(define-custom 'fmt-ja-fold-width 70
+  '(fmt-ja)
   '(integer 0 65535)
   (N_ "fold width")
   (N_ "long description will be here."))
 
-(define-custom 'fmt-selection-key '("s")
-               '(fmt)
+(define-custom 'fmt-ja-selection-key '("s")
+               '(fmt-ja)
 	       '(key)
-	       (N_ "[fmt] format selection")
+	       (N_ "[fmt-ja] format selection")
 	       (N_ "long description will be here"))
 
-(define-custom 'fmt-clipboard-key '("v")
-               '(fmt)
+(define-custom 'fmt-ja-clipboard-key '("v")
+               '(fmt-ja)
 	       '(key)
-	       (N_ "[fmt] format clipboard")
+	       (N_ "[fmt-ja] format clipboard")
 	       (N_ "long description will be here"))
