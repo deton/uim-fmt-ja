@@ -1,6 +1,6 @@
 ;;; IM to format selection or clipboard like fmt command.
 
-(require-extension (srfi 1 2))
+(require-extension (srfi 1 2 8))
 (require-custom "fmt-custom.scm")
 
 (define fmt-context-rec-spec context-rec-spec)
@@ -64,33 +64,52 @@
 (define (fmt-on-selection pc)
   (let ((str (fmt-acquire-text pc 'selection)))
     (if (string? str)
-      (im-commit pc
-        (string-list-concat
-          (fmt-on-list () (reverse (string-to-list str))))))))
+      (im-commit pc (fmt-str str)))))
 
 (define (fmt-on-clipboard pc)
   (let ((str (fmt-acquire-text pc 'clipboard)))
     (if (string? str)
-      (im-commit pc
-        (string-list-concat
-          (fmt-on-list () (reverse (string-to-list str))))))))
+      (im-commit pc (fmt-str str)))))
 
-(define (fmt-on-list res src)
-  (define (make-line line src)
+(define (fmt-str str)
+  (let* ((src-lines
+          (fmt-char-list->line-list '()
+            (reverse (string-to-list str))))
+         (res-lines
+          (fmt-line-list '() src-lines)))
+    (apply string-append
+      (append-map
+        (lambda (line)
+          (append line '("\n")))
+        (reverse res-lines)))))
+
+(define (fmt-line-list res-lines src-lines)
+  (define (join-and-fold-line line src-lines)
     (cond
-      ((null? src)
-        (fmt-on-list (append line res) src))
       ((>= (fmt-width line) fmt-fold-width)
-        ;; TODO: inhibit ",." on top
-        (fmt-on-list (append (cons "\n" line) res) src))
-      ((string=? (car src) "\n")
-        (make-line (cons " " line) (cdr src))) ; XXX: not add in Japanese
+        (receive
+          (line0 rest)
+          (fmt-fold-line line)
+          (fmt-line-list (cons line0 res-lines) (cons rest src-lines))))
+      ((or (null? src-lines)
+           (fmt-new-paragraph? (car src-lines)))
+        (fmt-line-list (cons line res-lines) src-lines))
       (else
-        (make-line (cons (car src) line) (cdr src)))))
-  ;(writeln src)
-  (if (null? src)
-    res
-    (make-line () src)))
+        (join-and-fold-line (append line (car src-lines)) (cdr src-lines)))))
+  (if (null? src-lines)
+    res-lines
+    (join-and-fold-line (car src-lines) (cdr src-lines))))
+
+(define (fmt-new-paragraph? line)
+  (null? line))
+
+(define (fmt-fold-line line)
+  (define (make-line line0 line)
+    (if (>= (fmt-width line0) fmt-fold-width)
+      (values (reverse line0) line)
+      (make-line (cons (car line) line0) (cdr line))))
+  (make-line '() line))
+;; TODO
 
 (define (fmt-width line)
   ;; TODO: support tab char
@@ -108,3 +127,14 @@
         0)
       (else
         (char->integer (car sl))))))
+
+(define (fmt-char-list->line-list res char-list)
+  (if (null? char-list)
+    (reverse res)
+    (receive
+      (line rest)
+      (break (lambda (x) (string=? x "\n")) char-list)
+      (fmt-char-list->line-list (cons line res)
+        (if (pair? rest)
+          (cdr rest) ; drop first "\n"
+          rest)))))
