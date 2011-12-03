@@ -97,13 +97,27 @@
            (fmt-new-paragraph? (car src-lines)))
         (fmt-line-list (cons line res-lines) src-lines))
       (else
-        (join-and-fold-line (append line (car src-lines)) (cdr src-lines)))))
+        (join-and-fold-line
+          (fmt-join-lines line (car src-lines))
+          (cdr src-lines)))))
   (if (null? src-lines)
     res-lines
     (join-and-fold-line (car src-lines) (cdr src-lines))))
 
 (define (fmt-new-paragraph? line)
-  (null? line))
+  (null? line)) ; empty line?
+  ;; TODO: indentation change
+
+(define (fmt-join-lines line1 line2)
+  (let* ((l1rev (drop-while fmt-str1-whitespace? (reverse line1)))
+         (l2 (drop-while fmt-str1-whitespace? line2)))
+    (writeln (list l1rev l2))
+    (if (or (null? l1rev)
+            (null? l2)
+            (fmt-str1-wide? (car l1rev))
+            (fmt-str1-wide? (car l2)))
+      (append (reverse l1rev) l2)
+      (append (reverse l1rev) '(" ") l2))))
 
 (define (fmt-fold-line line)
   (define (make-line line0 line)
@@ -116,19 +130,26 @@
 (define (fmt-width line)
   ;; TODO: support tab char
   (fold
-    (lambda (x sum) (+ sum (if (< (fmt-euc-jp-string->ichar x) 128) 1 2)))
+    (lambda (x sum) (+ sum (if (fmt-str1-wide? x) 2 1)))
     0
     line))
 
-(define (fmt-euc-jp-string->ichar s)
+(define (fmt-str1-wide? str1)
+  (let ((char (fmt-euc-jp-string->char str1)))
+    (and char
+         (>= (char->integer char) 128))))
+
+(define (fmt-str1-whitespace? str1)
+  (let ((char (fmt-euc-jp-string->char str1)))
+    (and char
+         (char-whitespace? char))))
+
+(define (fmt-euc-jp-string->char s)
   (let ((sl (with-char-codec "EUC-JP"
               (lambda ()
                 (string->list s)))))
-    (cond
-      ((null? sl)
-        0)
-      (else
-        (char->integer (car sl))))))
+    (and (not (null? sl))
+         (car sl))))
 
 (define (fmt-char-list->line-list res char-list)
   (if (null? char-list)
