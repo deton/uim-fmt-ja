@@ -86,6 +86,8 @@
 (define (fmt-line-list res-lines src-lines)
   (define (join-and-fold-line line src-lines)
     (cond
+      ((null? line) ; empty line?
+        (fmt-line-list (cons line res-lines) src-lines))
       ((>= (fmt-width line) fmt-fold-width)
         (receive
           (line0 rest)
