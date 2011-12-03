@@ -129,14 +129,17 @@
         (if (null? line0)
           (values line '())
           (values (reverse line0) line)))
-      ((>= (fmt-width line0) fmt-fold-width)
-        (receive
-          (last-word rest)
-          (break fmt-str1-whitespace? line0)
-          (if (null? rest) ; no whitespace?
-            (make-line (cons (car line) line0) (cdr line)) ; do not fold line
-            (values (reverse (drop-while fmt-str1-whitespace? rest))
-                    (append (reverse last-word) line)))))
+      ((> (fmt-width line0) fmt-fold-width)
+        (if (fmt-str1-wide? (car line0))
+          (values (reverse (cdr line0)) ; TODO: support KINSOKU
+                  (cons (car line0) line))
+          (receive
+            (last-word rest)
+            (break fmt-str1-whitespace? line0)
+            (if (null? rest) ; no whitespace?
+              (make-line (cons (car line) line0) (cdr line)) ; do not fold line
+              (values (reverse (drop-while fmt-str1-whitespace? rest))
+                      (append (reverse last-word) line))))))
       (else
         (make-line (cons (car line) line0) (cdr line)))))
   (make-line '() line))
