@@ -134,8 +134,11 @@
   (define (make-line line0 line)
     (define (fold-line line0 line)
       (define (kinsoku line0 line)
-        (if (or (string-contains fmt-ja-kinsoku-chars-on-start (car line) 0)
-                (string-contains fmt-ja-kinsoku-chars-on-end (car line0) 0))
+        (if (or
+              (and (pair? line)
+                   (string-contains fmt-ja-kinsoku-chars-on-start (car line) 0))
+              (and (pair? line0)
+                   (string-contains fmt-ja-kinsoku-chars-on-end (car line0) 0)))
           (fold-line line0 line)
           (values line0 line)))
       (define (fold-line-latin line0 line)
@@ -146,7 +149,8 @@
               (or (fmt-ja-str1-whitespace? x)
                   (fmt-ja-str1-wide? x)))
             line0)
-          (if (null? rest) ; no whitespace?
+          (if (and (null? rest) ; no whitespace?
+                   (pair? line))
             (make-line (cons (car line) line0) (cdr line)) ; do not fold line
             (kinsoku
               (drop-while fmt-ja-str1-whitespace? rest)
@@ -161,17 +165,18 @@
         (else
           (fold-line-latin line0 line))))
     (cond
-      ((null? line)
-        (if (null? line0)
-          (values line '())
-          (values (reverse line0) line)))
       ((> (fmt-ja-width (reverse line0)) fmt-ja-fold-width)
         (receive
           (l0 rest)
           (fold-line line0 line)
-          (if (null? l0) ; got empty line? (all chars are Kinsoku char)
+          (if (and (null? l0) ; got empty line? (all chars are Kinsoku char)
+                   (pair? line))
             (make-line (cons (car line) line0) (cdr line)) ; do not fold line
             (values (reverse l0) rest))))
+      ((null? line)
+        (if (null? line0)
+          (values line '())
+          (values (reverse line0) line)))
       (else
         (make-line (cons (car line) line0) (cdr line)))))
   (make-line '() line))
