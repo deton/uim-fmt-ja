@@ -125,6 +125,11 @@
 (define (fmt-ja-fold-line line)
   (define (make-line line0 line)
     (define (fold-line line0 line)
+      (define (kinsoku-for-start line0 line)
+        (let ((start-ch (car line)))
+          (if (string-contains fmt-ja-kinsoku-chars-on-start start-ch 0)
+            (fold-line line0 line)
+            (values line0 line))))
       (define (fold-line-latin line0 line)
         (receive
           (last-word rest)
@@ -135,14 +140,11 @@
             line0)
           (if (null? rest) ; no whitespace?
             (make-line (cons (car line) line0) (cdr line)) ; do not fold line
-            (values (reverse (drop-while fmt-ja-str1-whitespace? rest))
-                    (append (reverse last-word) line)))))
+            (kinsoku-for-start
+              (drop-while fmt-ja-str1-whitespace? rest)
+              (append (reverse last-word) line)))))
       (define (fold-line-ja line0 line)
-        (let ((last-ch (car line0)))
-          (if (string-contains fmt-ja-kinsoku-chars-on-start last-ch 0)
-            (fold-line (cdr line0) (cons last-ch line))
-            (values (reverse (cdr line0))
-                    (cons last-ch line)))))
+        (kinsoku-for-start (cdr line0) (cons (car line0) line)))
       (cond
         ((null? line0) ; all chars are Kinsoku char?
           (values '() line))
@@ -161,7 +163,7 @@
           (fold-line line0 line)
           (if (null? l0) ; got empty line? (all chars are Kinsoku char)
             (make-line (cons (car line) line0) (cdr line)) ; do not fold line
-            (values l0 rest))))
+            (values (reverse l0) rest))))
       (else
         (make-line (cons (car line) line0) (cdr line)))))
   (make-line '() line))
