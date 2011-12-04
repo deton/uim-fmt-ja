@@ -76,17 +76,17 @@
           (fmt-ja-char-list->line-list '()
             (reverse (string-to-list str))))
          (res-lines
-          (fmt-ja-line-list '() src-lines '())))
+          (fmt-ja-line-list '() src-lines)))
     (apply string-append
       (append-map
         (lambda (line)
           (append line '("\n")))
         (reverse res-lines)))))
 
-(define (fmt-ja-line-list res-lines src-lines indent)
-  (define (join-and-fold-line line src-lines)
-    (define (get-indent line)
-      (take-while fmt-ja-str1-whitespace? line))
+(define (fmt-ja-line-list res-lines src-lines)
+  (define (get-indent line)
+    (take-while fmt-ja-str1-whitespace? line))
+  (define (join-and-fold-line line src-lines indent)
     (define (same-indent? i1 i2)
       (equal? i1 i2)) ; XXX: treat equal spaces and tab?
     (define (new-paragraph? line cur-indent)
@@ -94,8 +94,8 @@
           (not (same-indent? (get-indent line) cur-indent))))
     (cond
       ((null? line) ; empty line?
-        (fmt-ja-line-list (cons line res-lines) src-lines '()))
-      ((>= (fmt-ja-width line) fmt-ja-fold-width)
+        (fmt-ja-line-list (cons line res-lines) src-lines))
+      ((> (fmt-ja-width line) fmt-ja-fold-width)
         (receive
           (line0 rest)
           (fmt-ja-fold-line line)
@@ -103,22 +103,22 @@
             (cons line0 res-lines)
             (if (null? rest)
               src-lines ; avoid to add non-exist empty line
-              (cons rest src-lines))
-            indent)))
+              (cons (append indent rest) src-lines)))))
       ((null? src-lines)
         (cons line res-lines))
       ((new-paragraph? (car src-lines) indent)
-        (fmt-ja-line-list
-          (cons line res-lines)
-          src-lines
-          (get-indent (car src-lines))))
+        (fmt-ja-line-list (cons line res-lines) src-lines))
       (else
         (join-and-fold-line
           (fmt-ja-join-lines line (car src-lines))
-          (cdr src-lines)))))
+          (cdr src-lines)
+          indent))))
   (if (null? src-lines)
     res-lines
-    (join-and-fold-line (car src-lines) (cdr src-lines))))
+    (join-and-fold-line
+      (car src-lines)
+      (cdr src-lines)
+      (get-indent (car src-lines)))))
 
 (define (fmt-ja-join-lines line1 line2)
   (let* ((l1rev (drop-while fmt-ja-str1-whitespace? (reverse line1)))
