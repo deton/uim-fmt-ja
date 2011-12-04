@@ -72,16 +72,21 @@
       (im-commit pc (fmt-ja-str str)))))
 
 (define (fmt-ja-str str)
-  (let* ((src-lines
+  (let* ((char-list (string-to-list str))
+         (src-lines
           (fmt-ja-char-list->line-list '()
-            (reverse (string-to-list str))))
+            (reverse char-list)))
          (res-lines
-          (fmt-ja-line-list '() src-lines)))
+          (fmt-ja-line-list '() src-lines))
+         (res-char-list
+          (append-map
+            (lambda (line)
+              (append line '("\n")))
+            (reverse res-lines))))
     (apply string-append
-      (append-map
-        (lambda (line)
-          (append line '("\n")))
-        (reverse res-lines)))))
+      (if (not (string=? (car char-list) "\n")) ; str is not terminated with \n
+        (drop-right res-char-list 1)
+        res-char-list))))
 
 (define (fmt-ja-line-list res-lines src-lines)
   (define (get-indent line)
