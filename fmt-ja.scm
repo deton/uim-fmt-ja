@@ -147,7 +147,8 @@
         ((null? line0) ; all chars are Kinsoku char?
           (values '() line))
         ((fmt-ja-str1-wide? (car line0))
-          (fold-line-ja line0 line)
+          (fold-line-ja line0 line))
+        (else
           (fold-line-latin line0 line))))
     (cond
       ((null? line)
