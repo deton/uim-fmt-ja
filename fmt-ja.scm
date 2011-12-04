@@ -88,7 +88,7 @@
     (take-while fmt-ja-str1-whitespace? line))
   (define (join-and-fold-line line src-lines indent)
     (define (same-indent? i1 i2)
-      (equal? i1 i2)) ; XXX: treat equal spaces and tab?
+      (equal? i1 i2)) ; XXX: treat tab as spaces?
     (define (new-paragraph? line cur-indent)
       (or (null? line)
           (not (same-indent? (get-indent line) cur-indent))))
@@ -165,7 +165,7 @@
         (if (null? line0)
           (values line '())
           (values (reverse line0) line)))
-      ((> (fmt-ja-width line0) fmt-ja-fold-width)
+      ((> (fmt-ja-width (reverse line0)) fmt-ja-fold-width)
         (receive
           (l0 rest)
           (fold-line line0 line)
@@ -177,9 +177,11 @@
   (make-line '() line))
 
 (define (fmt-ja-width line)
-  ;; TODO: support tab char
   (fold
-    (lambda (x sum) (+ sum (if (fmt-ja-str1-wide? x) 2 1)))
+    (lambda (x col)
+      (if (and (string=? x "\t") (not (zero? fmt-ja-tab-width)))
+        (* (+ (quotient col fmt-ja-tab-width) 1) fmt-ja-tab-width)
+        (+ col (if (fmt-ja-str1-wide? x) 2 1))))
     0
     line))
 

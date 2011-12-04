@@ -27,6 +27,12 @@
   (N_ "Kinsoku characters on end of line")
   (N_ "long description will be here."))
 
+(define-custom 'fmt-ja-tab-width 8
+  '(fmt-ja)
+  '(integer 0 65535)
+  (N_ "fold width")
+  (N_ "long description will be here."))
+
 (define-custom 'fmt-ja-selection-key '("s")
                '(fmt-ja)
 	       '(key)
