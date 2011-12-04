@@ -13,6 +13,20 @@
   (N_ "fold width")
   (N_ "long description will be here."))
 
+(define-custom 'fmt-ja-kinsoku-chars-on-start
+  "¡¼¡Ý¡½¡Á¡¢¡£¡¤¡¥¡§¡¨¡©¡ª¡«¡¬¡ë¡ì¡í¡î¡ñ¢ó¡³¡´¡µ¡¶¡Ä¡Å¡¹¡¾¡¦­á¡Ç¡É¡Ë¡Í¡Ï¡Ñ¡Ó¡Õ¡×¡Ù¡Û¤¡¤£¤¥¤§¤©¤Ã¤ã¤å¤ç¤î¥¡¥£¥¥¥§¥©¥Ã¥ã¥å¥ç¥î¥õ¥ö.,:;!?>)}]-"
+  '(fmt-ja)
+  '(string ".*")
+  (N_ "Kinsoku characters on start of line")
+  (N_ "long description will be here."))
+
+(define-custom 'fmt-ja-kinsoku-chars-on-end
+  "­à¡Æ¡È¡Ê¡Ì¡Î¡Ð¡Ò¡Ô¡Ö¡Ø¡Ú<({["
+  '(fmt-ja)
+  '(string ".*")
+  (N_ "Kinsoku characters on end of line")
+  (N_ "long description will be here."))
+
 (define-custom 'fmt-ja-selection-key '("s")
                '(fmt-ja)
 	       '(key)

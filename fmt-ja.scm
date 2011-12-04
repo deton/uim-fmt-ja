@@ -124,30 +124,43 @@
 
 (define (fmt-ja-fold-line line)
   (define (make-line line0 line)
-    (define (fold-line-latin line0 line)
-      (receive
-        (last-word rest)
-        (break
-          (lambda (x)
-            (or (fmt-ja-str1-whitespace? x)
-                (fmt-ja-str1-wide? x)))
-          line0)
-        (if (null? rest) ; no whitespace?
-          (make-line (cons (car line) line0) (cdr line)) ; do not fold line
-          (values (reverse (drop-while fmt-ja-str1-whitespace? rest))
-                  (append (reverse last-word) line)))))
-    (define (fold-line-ja line0 line)
-      (values (reverse (cdr line0)) ; TODO: support KINSOKU
-              (cons (car line0) line)))
+    (define (fold-line line0 line)
+      (define (fold-line-latin line0 line)
+        (receive
+          (last-word rest)
+          (break
+            (lambda (x)
+              (or (fmt-ja-str1-whitespace? x)
+                  (fmt-ja-str1-wide? x)))
+            line0)
+          (if (null? rest) ; no whitespace?
+            (make-line (cons (car line) line0) (cdr line)) ; do not fold line
+            (values (reverse (drop-while fmt-ja-str1-whitespace? rest))
+                    (append (reverse last-word) line)))))
+      (define (fold-line-ja line0 line)
+        (let ((last-ch (car line0)))
+          (if (string-contains fmt-ja-kinsoku-chars-on-start last-ch 0)
+            (fold-line (cdr line0) (cons last-ch line))
+            (values (reverse (cdr line0))
+                    (cons last-ch line)))))
+      (cond
+        ((null? line0) ; all chars are Kinsoku char?
+          (values '() line))
+        ((fmt-ja-str1-wide? (car line0))
+          (fold-line-ja line0 line)
+          (fold-line-latin line0 line))))
     (cond
       ((null? line)
         (if (null? line0)
           (values line '())
           (values (reverse line0) line)))
       ((> (fmt-ja-width line0) fmt-ja-fold-width)
-        (if (fmt-ja-str1-wide? (car line0))
-          (fold-line-ja line0 line)
-          (fold-line-latin line0 line)))
+        (receive
+          (l0 rest)
+          (fold-line line0 line)
+          (if (null? l0) ; got empty line? (all chars are Kinsoku char)
+            (make-line (cons (car line) line0) (cdr line)) ; do not fold line
+            (values l0 rest))))
       (else
         (make-line (cons (car line) line0) (cdr line)))))
   (make-line '() line))
