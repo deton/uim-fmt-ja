@@ -169,21 +169,23 @@
           (fold-line-ja line0 line))
         (else
           (fold-line-latin line0 line))))
-    (cond
-      ((> (fmt-ja-width (reverse line0)) fmt-ja-fold-width)
-        (receive
-          (l0 rest)
-          (fold-line line0 line)
-          (if (and (null? l0) ; got empty line? (all chars are Kinsoku char)
-                   (pair? line))
-            (make-line (cons (car line) line0) (cdr line)) ; do not fold line
-            (values (reverse l0) rest))))
-      ((null? line)
-        (if (null? line0)
-          (values line '())
-          (values (reverse line0) line)))
-      (else
-        (make-line (cons (car line) line0) (cdr line)))))
+    (let ((line0n (reverse line0)))
+      (cond
+        ((> (fmt-ja-width line0n) fmt-ja-fold-width)
+          (receive
+            (l0 rest)
+            (fold-line line0 line)
+            (if (null? l0) ; got empty line? (all chars are Kinsoku char)
+              (if (null? line)
+                (values line0n '())
+                (make-line (cons (car line) line0) (cdr line))) ; do not fold
+              (values (reverse l0) rest))))
+        ((null? line)
+          (if (null? line0)
+            (values line '())
+            (values line0n line)))
+        (else
+          (make-line (cons (car line) line0) (cdr line))))))
   (make-line '() line))
 
 (define (fmt-ja-width line)
