@@ -5,6 +5,6 @@
       res
       (read-input (cons ch res)))))
 
-(define str (list->string (reverse (read-input '()))))
-
-(display (fmt-ja-str str))
+(define (main args)
+  (let ((str (list->string (reverse (read-input '())))))
+    (display (fmt-ja-str str))))
