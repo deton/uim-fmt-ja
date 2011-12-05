@@ -62,3 +62,15 @@
 	       '(key)
 	       (N_ "[fmt-ja] format clipboard")
 	       (N_ "long description will be here"))
+
+(custom-add-hook 'fmt-ja-kinsoku-chars-on-start-utf8
+  'custom-set-hooks
+  (lambda ()
+    (set! fmt-ja-kinsoku-chars-on-start
+      (fmt-ja-utf8->eucjp fmt-ja-kinsoku-chars-on-start-utf8))))
+
+(custom-add-hook 'fmt-ja-kinsoku-chars-on-end-utf8
+  'custom-set-hooks
+  (lambda ()
+    (set! fmt-ja-kinsoku-chars-on-end
+      (fmt-ja-utf8->eucjp fmt-ja-kinsoku-chars-on-end-utf8))))
