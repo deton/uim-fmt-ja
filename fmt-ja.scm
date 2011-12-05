@@ -3,6 +3,11 @@
 (require-extension (srfi 1 2 8))
 (require-custom "fmt-ja-custom.scm")
 
+(set! fmt-ja-kinsoku-chars-on-start
+  (fmt-ja-utf8->eucjp fmt-ja-kinsoku-chars-on-start-utf8))
+(set! fmt-ja-kinsoku-chars-on-end
+  (fmt-ja-utf8->eucjp fmt-ja-kinsoku-chars-on-end-utf8))
+
 (define fmt-ja-context-rec-spec context-rec-spec)
 (define-record 'fmt-ja-context fmt-ja-context-rec-spec)
 (define fmt-ja-context-new-internal fmt-ja-context-new)
