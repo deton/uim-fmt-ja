@@ -57,7 +57,7 @@
 	       (N_ "[fmt-ja] format selection")
 	       (N_ "long description will be here"))
 
-(define-custom 'fmt-ja-clipboard-key '("v")
+(define-custom 'fmt-ja-clipboard-key '("<IgnoreCase><Shift>s")
                '(fmt-ja)
 	       '(key)
 	       (N_ "[fmt-ja] format clipboard")
