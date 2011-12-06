@@ -69,12 +69,14 @@
 (define (fmt-ja-on-selection pc)
   (let ((str (fmt-ja-acquire-text pc 'selection)))
     (if (string? str)
-      (im-commit pc (fmt-ja-str str)))))
+      (im-commit pc (fmt-ja-str str))
+      (im-commit-raw pc))))
 
 (define (fmt-ja-on-clipboard pc)
   (let ((str (fmt-ja-acquire-text pc 'clipboard)))
     (if (string? str)
-      (im-commit pc (fmt-ja-str str)))))
+      (im-commit pc (fmt-ja-str str))
+      (im-commit-raw pc))))
 
 (define (fmt-ja-str str)
   (let* ((char-list (string-to-list str))
