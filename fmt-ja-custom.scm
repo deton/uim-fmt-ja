@@ -25,21 +25,21 @@
 (define (fmt-ja-utf8->eucjp utf8-str)
   (fmt-ja-iconv "EUC-JP" "UTF-8" utf8-str))
 
-(define fmt-ja-kinsoku-chars-on-start
+(define fmt-ja-kinsoku-chars-on-start-eucjp
   "¡¼¡Ý¡Á¡¢¡£¡¤¡¥¡§¡¨¡©¡ª¡«¡¬¡ë¡ì¡í¡î¡ñ¢ó¡³¡´¡µ¡¶¡Ä¡Å¡¹¡¾¡¦­á¡Ç¡É¡Ë¡Í¡Ï¡Ñ¡Ó¡Õ¡×¡Ù¡Û¤¡¤£¤¥¤§¤©¤Ã¤ã¤å¤ç¤î¥¡¥£¥¥¥§¥©¥Ã¥ã¥å¥ç¥î¥õ¥ö.,:;!?>)}]-")
 
-(define-custom 'fmt-ja-kinsoku-chars-on-start-utf8
-  (fmt-ja-eucjp->utf8 fmt-ja-kinsoku-chars-on-start)
+(define-custom 'fmt-ja-kinsoku-chars-on-start
+  (fmt-ja-eucjp->utf8 fmt-ja-kinsoku-chars-on-start-eucjp)
   '(fmt-ja)
   '(string ".*")
   (N_ "Kinsoku characters on start of line")
   (N_ "long description will be here."))
 
-(define fmt-ja-kinsoku-chars-on-end
+(define fmt-ja-kinsoku-chars-on-end-eucjp
   "­à¡Æ¡È¡Ê¡Ì¡Î¡Ð¡Ò¡Ô¡Ö¡Ø¡Ú<({[")
 
-(define-custom 'fmt-ja-kinsoku-chars-on-end-utf8
-  (fmt-ja-eucjp->utf8 fmt-ja-kinsoku-chars-on-end)
+(define-custom 'fmt-ja-kinsoku-chars-on-end
+  (fmt-ja-eucjp->utf8 fmt-ja-kinsoku-chars-on-end-eucjp)
   '(fmt-ja)
   '(string ".*")
   (N_ "Kinsoku characters on end of line")
@@ -48,7 +48,7 @@
 (define-custom 'fmt-ja-tab-width 8
   '(fmt-ja)
   '(integer 0 65535)
-  (N_ "fold width")
+  (N_ "tab width")
   (N_ "long description will be here."))
 
 (define-custom 'fmt-ja-selection-key '("s")
@@ -63,14 +63,14 @@
 	       (N_ "[fmt-ja] format clipboard")
 	       (N_ "long description will be here"))
 
-(custom-add-hook 'fmt-ja-kinsoku-chars-on-start-utf8
+(custom-add-hook 'fmt-ja-kinsoku-chars-on-start
   'custom-set-hooks
   (lambda ()
-    (set! fmt-ja-kinsoku-chars-on-start
-      (fmt-ja-utf8->eucjp fmt-ja-kinsoku-chars-on-start-utf8))))
+    (set! fmt-ja-kinsoku-chars-on-start-eucjp
+      (fmt-ja-utf8->eucjp fmt-ja-kinsoku-chars-on-start))))
 
-(custom-add-hook 'fmt-ja-kinsoku-chars-on-end-utf8
+(custom-add-hook 'fmt-ja-kinsoku-chars-on-end
   'custom-set-hooks
   (lambda ()
-    (set! fmt-ja-kinsoku-chars-on-end
-      (fmt-ja-utf8->eucjp fmt-ja-kinsoku-chars-on-end-utf8))))
+    (set! fmt-ja-kinsoku-chars-on-end-eucjp
+      (fmt-ja-utf8->eucjp fmt-ja-kinsoku-chars-on-end))))

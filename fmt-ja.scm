@@ -3,10 +3,10 @@
 (require-extension (srfi 1 2 8))
 (require-custom "fmt-ja-custom.scm")
 
-(set! fmt-ja-kinsoku-chars-on-start
-  (fmt-ja-utf8->eucjp fmt-ja-kinsoku-chars-on-start-utf8))
-(set! fmt-ja-kinsoku-chars-on-end
-  (fmt-ja-utf8->eucjp fmt-ja-kinsoku-chars-on-end-utf8))
+(set! fmt-ja-kinsoku-chars-on-start-eucjp
+  (fmt-ja-utf8->eucjp fmt-ja-kinsoku-chars-on-start))
+(set! fmt-ja-kinsoku-chars-on-end-eucjp
+  (fmt-ja-utf8->eucjp fmt-ja-kinsoku-chars-on-end))
 
 (define fmt-ja-context-rec-spec context-rec-spec)
 (define-record 'fmt-ja-context fmt-ja-context-rec-spec)
@@ -146,9 +146,11 @@
       (define (kinsoku line0 line)
         (if (or
               (and (pair? line)
-                   (string-contains fmt-ja-kinsoku-chars-on-start (car line) 0))
+                   (string-contains fmt-ja-kinsoku-chars-on-start-eucjp
+                                    (car line) 0))
               (and (pair? line0)
-                   (string-contains fmt-ja-kinsoku-chars-on-end (car line0) 0)))
+                   (string-contains fmt-ja-kinsoku-chars-on-end-eucjp
+                                    (car line0) 0)))
           (fold-line line0 line)
           (values line0 line)))
       (define (fold-line-latin line0 line)
