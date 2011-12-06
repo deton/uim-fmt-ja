@@ -3,9 +3,9 @@
 (require-extension (srfi 1 2 8))
 (require-custom "fmt-ja-custom.scm")
 
-(set! fmt-ja-kinsoku-chars-on-start-eucjp
+(set! fmt-ja-kinsoku-chars-on-start-internal
   (fmt-ja-utf8->eucjp fmt-ja-kinsoku-chars-on-start))
-(set! fmt-ja-kinsoku-chars-on-end-eucjp
+(set! fmt-ja-kinsoku-chars-on-end-internal
   (fmt-ja-utf8->eucjp fmt-ja-kinsoku-chars-on-end))
 
 (define fmt-ja-context-rec-spec context-rec-spec)
@@ -146,10 +146,10 @@
       (define (kinsoku line0 line)
         (if (or
               (and (pair? line)
-                   (string-contains fmt-ja-kinsoku-chars-on-start-eucjp
+                   (string-contains fmt-ja-kinsoku-chars-on-start-internal
                                     (car line) 0))
               (and (pair? line0)
-                   (string-contains fmt-ja-kinsoku-chars-on-end-eucjp
+                   (string-contains fmt-ja-kinsoku-chars-on-end-internal
                                     (car line0) 0)))
           (fold-line line0 line)
           (values line0 line)))

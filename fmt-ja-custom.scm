@@ -25,21 +25,21 @@
 (define (fmt-ja-utf8->eucjp utf8-str)
   (fmt-ja-iconv "EUC-JP" "UTF-8" utf8-str))
 
-(define fmt-ja-kinsoku-chars-on-start-eucjp
+(define fmt-ja-kinsoku-chars-on-start-internal
   "¡¼¡Ý¡Á¡¢¡£¡¤¡¥¡§¡¨¡©¡ª¡«¡¬¡ë¡ì¡í¡î¡ñ¢ó¡³¡´¡µ¡¶¡Ä¡Å¡¹¡¾¡¦­á¡Ç¡É¡Ë¡Í¡Ï¡Ñ¡Ó¡Õ¡×¡Ù¡Û¤¡¤£¤¥¤§¤©¤Ã¤ã¤å¤ç¤î¥¡¥£¥¥¥§¥©¥Ã¥ã¥å¥ç¥î¥õ¥ö.,:;!?>)}]-")
 
 (define-custom 'fmt-ja-kinsoku-chars-on-start
-  (fmt-ja-eucjp->utf8 fmt-ja-kinsoku-chars-on-start-eucjp)
+  (fmt-ja-eucjp->utf8 fmt-ja-kinsoku-chars-on-start-internal)
   '(fmt-ja)
   '(string ".*")
   (N_ "Kinsoku characters on start of line")
   (N_ "long description will be here."))
 
-(define fmt-ja-kinsoku-chars-on-end-eucjp
+(define fmt-ja-kinsoku-chars-on-end-internal
   "­à¡Æ¡È¡Ê¡Ì¡Î¡Ð¡Ò¡Ô¡Ö¡Ø¡Ú<({[")
 
 (define-custom 'fmt-ja-kinsoku-chars-on-end
-  (fmt-ja-eucjp->utf8 fmt-ja-kinsoku-chars-on-end-eucjp)
+  (fmt-ja-eucjp->utf8 fmt-ja-kinsoku-chars-on-end-internal)
   '(fmt-ja)
   '(string ".*")
   (N_ "Kinsoku characters on end of line")
@@ -66,11 +66,11 @@
 (custom-add-hook 'fmt-ja-kinsoku-chars-on-start
   'custom-set-hooks
   (lambda ()
-    (set! fmt-ja-kinsoku-chars-on-start-eucjp
+    (set! fmt-ja-kinsoku-chars-on-start-internal
       (fmt-ja-utf8->eucjp fmt-ja-kinsoku-chars-on-start))))
 
 (custom-add-hook 'fmt-ja-kinsoku-chars-on-end
   'custom-set-hooks
   (lambda ()
-    (set! fmt-ja-kinsoku-chars-on-end-eucjp
+    (set! fmt-ja-kinsoku-chars-on-end-internal
       (fmt-ja-utf8->eucjp fmt-ja-kinsoku-chars-on-end))))
