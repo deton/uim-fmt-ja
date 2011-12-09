@@ -110,27 +110,27 @@
     (define (same-indent? i1 i2)
       (equal? i1 i2)) ; XXX: treat tab as spaces?
     (define (new-paragraph? line cur-indent)
-      (not (same-indent? (fmt-ja-get-indent line) cur-indent)))
+      (or (null? line) ; empty line?
+          (not (same-indent? (fmt-ja-get-indent line) cur-indent))))
     (if (null? src-lines)
       (cons paragraph joined-lines)
       (let ((line (car src-lines)))
-        (cond
-          ((null? line) ; empty line?
-            (fmt-ja-join-lines
-              (cons line (cons paragraph joined-lines)) (cdr src-lines)))
-          ((new-paragraph? line indent)
-            (fmt-ja-join-lines (cons paragraph joined-lines) src-lines))
-          (else
-            (join-paragraph
-              (fmt-ja-join-two-lines paragraph line)
-              (cdr src-lines)
-              indent))))))
-  (if (null? src-lines)
-    joined-lines
-    (join-paragraph
-      (car src-lines)
-      (cdr src-lines)
-      (fmt-ja-get-indent (car src-lines)))))
+        (if (new-paragraph? line indent)
+          (fmt-ja-join-lines (cons paragraph joined-lines) src-lines)
+          (join-paragraph
+            (fmt-ja-join-two-lines paragraph line)
+            (cdr src-lines)
+            indent)))))
+  (cond
+    ((null? src-lines)
+      joined-lines)
+    ((null? (car src-lines)) ; empty line?
+      (fmt-ja-join-lines (cons (car src-lines) joined-lines) (cdr src-lines)))
+    (else
+      (join-paragraph
+        (car src-lines)
+        (cdr src-lines)
+        (fmt-ja-get-indent (car src-lines))))))
 
 (define (fmt-ja-join-two-lines line1 line2)
   (let* ((l1rev (drop-while fmt-ja-str1-whitespace? (reverse line1)))
