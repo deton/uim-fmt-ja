@@ -105,7 +105,7 @@
 
 ;; lines->joined-lines
 (define (fmt-ja-join-lines joined-lines src-lines)
-  ;; join lines in paragraph to one line
+  ;; join lines in a paragraph to one line
   (define (join-paragraph paragraph src-lines indent)
     (define (same-indent? i1 i2)
       (equal? i1 i2)) ; XXX: treat tab as spaces?
@@ -121,16 +121,12 @@
             (fmt-ja-join-two-lines paragraph line)
             (cdr src-lines)
             indent)))))
-  (cond
-    ((null? src-lines)
-      joined-lines)
-    ((null? (car src-lines)) ; empty line?
-      (fmt-ja-join-lines (cons (car src-lines) joined-lines) (cdr src-lines)))
-    (else
-      (join-paragraph
-        (car src-lines)
-        (cdr src-lines)
-        (fmt-ja-get-indent (car src-lines))))))
+  (if (null? src-lines)
+    joined-lines
+    (let ((line (car src-lines)))
+      (if (null? line) ; empty line?
+        (fmt-ja-join-lines (cons line joined-lines) (cdr src-lines))
+        (join-paragraph line (cdr src-lines) (fmt-ja-get-indent line))))))
 
 (define (fmt-ja-join-two-lines line1 line2)
   (let* ((l1rev (drop-while fmt-ja-str1-whitespace? (reverse line1)))
