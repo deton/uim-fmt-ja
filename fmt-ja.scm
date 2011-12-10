@@ -84,7 +84,7 @@
           (fmt-ja-char-list->line-list '()
             (reverse char-list)))
          (res-lines
-          (fmt-ja-line-list '() src-lines))
+          (fmt-ja-line-list src-lines))
          (res-char-list
           (append-map
             (lambda (line)
@@ -95,7 +95,7 @@
         (drop-right res-char-list 1)
         res-char-list))))
 
-(define (fmt-ja-line-list res-lines src-lines)
+(define (fmt-ja-line-list src-lines)
   (fmt-ja-fold-lines '()
     (reverse (fmt-ja-join-lines '() src-lines))
     #f))
