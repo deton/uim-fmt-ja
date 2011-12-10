@@ -7,10 +7,16 @@
                      fmt-ja-im-name-label
                      fmt-ja-im-short-desc)
 
-(define-custom 'fmt-ja-fold-width 70
+(define-custom 'fmt-ja-goal-width 70
   '(fmt-ja)
   '(integer 0 65535)
-  (N_ "fold width")
+  (N_ "goal width")
+  (N_ "long description will be here."))
+
+(define-custom 'fmt-ja-max-width 72
+  '(fmt-ja)
+  '(integer 0 65535)
+  (N_ "max width")
   (N_ "long description will be here."))
 
 (define (fmt-ja-iconv enc-to enc-from str)
@@ -74,3 +80,15 @@
   (lambda ()
     (set! fmt-ja-kinsoku-chars-on-end-internal
       (fmt-ja-utf8->eucjp fmt-ja-kinsoku-chars-on-end))))
+
+(custom-add-hook 'fmt-ja-max-width
+  'custom-get-hooks
+  (lambda ()
+    (if (< fmt-ja-max-width fmt-ja-goal-width)
+      (set! fmt-ja-max-width fmt-ja-goal-width))))
+
+(custom-add-hook 'fmt-ja-goal-width
+  'custom-set-hooks
+  (lambda ()
+    (if (< fmt-ja-max-width fmt-ja-goal-width)
+      (custom-set-value! 'fmt-ja-max-width fmt-ja-goal-width))))
