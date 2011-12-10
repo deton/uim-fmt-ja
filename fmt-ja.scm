@@ -109,7 +109,8 @@
   (define (join-paragraph paragraph src-lines indent)
     (define (paragraph-end? next-line cur-indent)
       (or (null? next-line) ; empty line?
-          (not (equal? (fmt-ja-get-indent next-line) cur-indent))))
+          (and fmt-ja-new-paragraph-by-indent-change
+               (not (equal? (fmt-ja-get-indent next-line) cur-indent)))))
     (cond
       ((null? src-lines)
         (cons paragraph joined-lines))

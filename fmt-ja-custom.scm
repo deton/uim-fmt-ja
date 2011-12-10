@@ -51,6 +51,12 @@
   (N_ "tab width")
   (N_ "long description will be here."))
 
+(define-custom 'fmt-ja-new-paragraph-by-indent-change #f
+  '(fmt-ja)
+  '(boolean)
+  (N_ "new paragraph by indent change")
+  (N_ "long description will be here."))
+
 (define-custom 'fmt-ja-selection-key '("s")
                '(fmt-ja)
 	       '(key)
