@@ -109,18 +109,20 @@
   (define (join-paragraph paragraph src-lines indent)
     (define (same-indent? i1 i2)
       (equal? i1 i2)) ; XXX: treat tab as spaces?
-    (define (new-paragraph? line cur-indent)
-      (or (null? line) ; empty line?
-          (not (same-indent? (fmt-ja-get-indent line) cur-indent))))
-    (if (null? src-lines)
-      (cons paragraph joined-lines)
-      (let ((line (car src-lines)))
-        (if (new-paragraph? line indent)
-          (fmt-ja-join-lines (cons paragraph joined-lines) src-lines)
-          (join-paragraph
-            (fmt-ja-join-two-lines paragraph line)
-            (cdr src-lines)
-            indent)))))
+    (define (paragraph-end? next-line cur-indent)
+      (or (null? next-line) ; empty line?
+          (not (same-indent? (fmt-ja-get-indent next-line) cur-indent))))
+    (cond
+      ((null? src-lines)
+        (cons paragraph joined-lines))
+      ((paragraph-end? (car src-lines) indent)
+        ;; next paragraph
+        (fmt-ja-join-lines (cons paragraph joined-lines) src-lines))
+      (else
+        (join-paragraph
+          (fmt-ja-join-two-lines paragraph (car src-lines))
+          (cdr src-lines)
+          indent))))
   (if (null? src-lines)
     joined-lines
     (let ((line (car src-lines)))
