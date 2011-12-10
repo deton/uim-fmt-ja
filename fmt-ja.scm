@@ -199,6 +199,7 @@
     (let ((line0n (reverse line0)))
       (cond
         ;; width of line0 becomes larger than the fold width by adding last char
+        ;; TODO: support goal and max width (Burasagari)
         ((> (fmt-ja-width line0n) fmt-ja-fold-width)
           (receive
             (l0 rest)
