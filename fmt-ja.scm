@@ -107,11 +107,9 @@
 (define (fmt-ja-join-lines joined-lines src-lines)
   ;; join lines in a paragraph to one line
   (define (join-paragraph paragraph src-lines indent)
-    (define (same-indent? i1 i2)
-      (equal? i1 i2)) ; XXX: treat tab as spaces?
     (define (paragraph-end? next-line cur-indent)
       (or (null? next-line) ; empty line?
-          (not (same-indent? (fmt-ja-get-indent next-line) cur-indent))))
+          (not (equal? (fmt-ja-get-indent next-line) cur-indent))))
     (cond
       ((null? src-lines)
         (cons paragraph joined-lines))
@@ -131,8 +129,8 @@
         (join-paragraph line (cdr src-lines) (fmt-ja-get-indent line))))))
 
 (define (fmt-ja-join-two-lines line1 line2)
-  (let* ((l1rev (drop-while fmt-ja-str1-whitespace? (reverse line1)))
-         (l2 (drop-while fmt-ja-str1-whitespace? line2)))
+  (let ((l1rev (drop-while fmt-ja-str1-whitespace? (reverse line1)))
+        (l2 (drop-while fmt-ja-str1-whitespace? line2)))
     (if (or (null? l1rev)
             (null? l2)
             (fmt-ja-str1-wide? (car l1rev))
@@ -154,8 +152,8 @@
               (fmt-ja-fold-line line)
               (fmt-ja-fold-lines
                 (cons line0 folded-lines)
-                (if (null? rest)
-                  (cdr src-lines) ; avoid to add non-exist empty line
+                (if (null? rest) ; avoid to add non-exist empty line
+                  (cdr src-lines)
                   (cons (append ind rest) (cdr src-lines)))
                 ind))))
         (else
