@@ -145,7 +145,7 @@
       (cond
         ((null? line) ; empty line?
           (fmt-ja-fold-lines (cons line folded-lines) (cdr src-lines) #f))
-        ((> (fmt-ja-width line) fmt-ja-fold-width)
+        ((> (fmt-ja-width line) fmt-ja-goal-width)
           (let ((ind (or indent (fmt-ja-get-indent line))))
             (receive
               (line0 rest)
@@ -197,7 +197,7 @@
           (fold-line-latin line0 line))))
     (let ((line0n (reverse line0)))
       (cond
-        ((> (fmt-ja-width line0n) fmt-ja-fold-width)
+        ((> (fmt-ja-width line0n) fmt-ja-goal-width)
           (receive
             (l0 rest)
             (fold-line line0 line)
