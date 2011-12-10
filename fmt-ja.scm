@@ -160,6 +160,7 @@
           (fmt-ja-fold-lines (cons line folded-lines) (cdr src-lines) #f))))))
 
 (define (fmt-ja-fold-line line)
+  ;; make line0 getting a character from line
   (define (make-line line0 line)
     (define (fold-line line0 line)
       (define (kinsoku line0 line)
@@ -197,6 +198,7 @@
           (fold-line-latin line0 line))))
     (let ((line0n (reverse line0)))
       (cond
+        ;; width of line0 becomes larger than the goal by adding last char
         ((> (fmt-ja-width line0n) fmt-ja-goal-width)
           (receive
             (l0 rest)
@@ -210,7 +212,7 @@
           (if (null? line0)
             (values line '())
             (values line0n line)))
-        (else
+        (else ; get a character to line0 from line
           (make-line (cons (car line) line0) (cdr line))))))
   (make-line '() line))
 
