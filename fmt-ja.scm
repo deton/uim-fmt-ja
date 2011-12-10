@@ -103,7 +103,7 @@
 (define (fmt-ja-get-indent line)
   (take-while fmt-ja-str1-whitespace? line))
 
-;; lines->joined-lines
+;; lines->joined-lines (lines->paragraph-list)
 (define (fmt-ja-join-lines joined-lines src-lines)
   ;; join lines in a paragraph to one line
   (define (join-paragraph paragraph src-lines indent)
