@@ -160,8 +160,8 @@
 (define (fmt-ja-fold-line line)
   ;; make line0 getting a character from line
   (define (make-line line0 line)
-    (define (fold-line line0 line)
-      (define (kinsoku line0 line)
+    (define (fold-line line0 line shrink?)
+      (define (kinsoku line0 line shrink?)
         (if (or
               (and (pair? line)
                    (string-contains fmt-ja-kinsoku-chars-on-start-internal
@@ -169,44 +169,69 @@
               (and (pair? line0)
                    (string-contains fmt-ja-kinsoku-chars-on-end-internal
                                     (car line0) 0)))
-          (fold-line line0 line)
+          (if shrink?
+            (fold-line line0 line #t)
+            (if (pair? line)
+              (fold-line (cons (car line) line0) (cdr line) #f)
+              (values line0 line)))
           (values line0 line)))
-      (define (fold-line-latin line0 line)
-        (receive
-          (last-word rest)
-          (break
-            (lambda (x)
-              (or (fmt-ja-str1-whitespace? x)
-                  (fmt-ja-str1-wide? x)))
-            line0)
-          (if (and (null? rest) ; no whitespace?
-                   (pair? line))
-            (make-line (cons (car line) line0) (cdr line)) ; do not fold line
+      (define (fold-line-latin line0 line shrink?)
+        (define (word-limit? char)
+          (or (fmt-ja-str1-whitespace? char)
+              (fmt-ja-str1-wide? char)))
+        (if shrink?
+          (receive (last-word rest) (break word-limit? line0)
+            (if (null? rest) ; no whitespace?
+              (values '() line)
+              (kinsoku
+                (drop-while fmt-ja-str1-whitespace? rest)
+                (append (reverse last-word) line)
+                #t)))
+          ;; expand
+          (receive (word-tail rest) (break word-limit? line)
             (kinsoku
+              (append (reverse word-tail) line0)
               (drop-while fmt-ja-str1-whitespace? rest)
-              (append (reverse last-word) line)))))
-      (define (fold-line-ja line0 line)
-        (kinsoku (cdr line0) (cons (car line0) line)))
+              #f))))
+      (define (fold-line-ja line0 line shrink?)
+        (if shrink?
+          (kinsoku (cdr line0) (cons (car line0) line) #t)
+          (kinsoku line0 line #f)))
       (cond
         ((null? line0) ; all chars are Kinsoku char?
           (values '() line))
         ((fmt-ja-str1-wide? (car line0))
-          (fold-line-ja line0 line))
+          (fold-line-ja line0 line shrink?))
         (else
-          (fold-line-latin line0 line))))
+          (fold-line-latin line0 line shrink?))))
     (let ((line0n (reverse line0)))
       (cond
         ;; width of line0 becomes larger than the goal by adding last char
-        ;; TODO: support goal and max width (Burasagari)
         ((> (fmt-ja-width line0n) fmt-ja-goal-width)
           (receive
-            (l0 rest)
-            (fold-line line0 line)
-            (if (null? l0) ; got empty line? (all chars are Kinsoku char)
-              (if (null? line)
-                (values line0n '())
-                (make-line (cons (car line) line0) (cdr line))) ; do not fold
-              (values (reverse l0) rest))))
+            (s-l0 s-rest)
+            (fold-line line0 line #t) ; shrink
+            (let ((s-width (fmt-ja-width (reverse s-l0))))
+              (cond
+                ((= s-width fmt-ja-goal-width)
+                  (values (reverse s-l0) s-rest))
+                ((> fmt-ja-max-width fmt-ja-goal-width)
+                  (receive
+                    (e-l0 e-rest)
+                    (fold-line line0 line #f) ; expand
+                    (let ((e-width (fmt-ja-width (reverse e-l0))))
+                      (if (or (and (<= e-width fmt-ja-max-width)
+                                   (<= (abs (- e-width fmt-ja-goal-width))
+                                       (abs (- fmt-ja-goal-width s-width))))
+                              (null? s-l0)) ; avoid infinite loop
+                        (values (reverse e-l0) e-rest)
+                        (values (reverse s-l0) s-rest)))))
+                ((null? s-l0) ; got empty line? (all chars are Kinsoku char)
+                  (if (null? line)
+                    (values line0n '())
+                    (make-line (cons (car line) line0) (cdr line)))) ;donot fold
+                (else
+                  (values (reverse s-l0) s-rest))))))
         ((null? line)
           (if (null? line0)
             (values line '())
