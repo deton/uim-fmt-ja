@@ -80,11 +80,8 @@
 
 (define (fmt-ja-str str)
   (let* ((char-list (string-to-list str))
-         (src-lines
-          (fmt-ja-char-list->line-list '()
-            (reverse char-list)))
-         (res-lines
-          (fmt-ja-line-list src-lines))
+         (src-lines (fmt-ja-char-list->line-list '() (reverse char-list)))
+         (res-lines (fmt-ja-line-list src-lines))
          (res-char-list
           (append-map
             (lambda (line)
