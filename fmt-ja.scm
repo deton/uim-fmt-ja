@@ -185,7 +185,8 @@
               (values '() line)
               (kinsoku
                 (drop-while fmt-ja-str1-whitespace? rest)
-                (append (reverse last-word) line)
+                (drop-while fmt-ja-str1-whitespace? ; for (car line0) is space
+                  (append (reverse last-word) line))
                 #t)))
           ;; expand
           (receive (word-tail rest) (break word-limit? line)
