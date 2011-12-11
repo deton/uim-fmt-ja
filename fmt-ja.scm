@@ -178,9 +178,7 @@
           (fmt-ja-fold-lines (cons line folded-lines) (cdr src-lines) #f))
         ((> (fmt-ja-width line) fmt-ja-goal-width)
           (let ((ind (or indent (fmt-ja-get-indent line))))
-            (receive
-              (line0 rest)
-              (fmt-ja-fold-line line)
+            (receive (line0 rest) (fmt-ja-fold-line line)
               (fmt-ja-fold-lines
                 (cons line0 folded-lines)
                 (if (null? rest) ; avoid to add non-exist empty line
@@ -195,13 +193,12 @@
   (define (make-line line0 line)
     (define (fold-line line0 line shrink?)
       (define (kinsoku line0 line shrink?)
-        (if (or
-              (and (pair? line)
-                   (string-contains fmt-ja-kinsoku-chars-on-start-internal
-                                    (car line) 0))
-              (and (pair? line0)
-                   (string-contains fmt-ja-kinsoku-chars-on-end-internal
-                                    (car line0) 0)))
+        (if (or (and (pair? line)
+                     (string-contains fmt-ja-kinsoku-chars-on-start-internal
+                                      (car line) 0))
+                (and (pair? line0)
+                     (string-contains fmt-ja-kinsoku-chars-on-end-internal
+                                      (car line0) 0)))
           (if shrink?
             (fold-line line0 line #t)
             (if (pair? line)
@@ -242,17 +239,13 @@
       (cond
         ;; width of line0 becomes larger than the goal by adding last char
         ((> (fmt-ja-width line0n) fmt-ja-goal-width)
-          (receive
-            (s-l0 s-rest)
-            (fold-line line0 line #t) ; shrink
+          (receive (s-l0 s-rest) (fold-line line0 line #t) ; shrink
             (let ((s-width (fmt-ja-width (reverse s-l0))))
               (cond
                 ((= s-width fmt-ja-goal-width)
                   (values (reverse s-l0) s-rest))
                 ((> fmt-ja-max-width fmt-ja-goal-width)
-                  (receive
-                    (e-l0 e-rest)
-                    (fold-line line0 line #f) ; expand
+                  (receive (e-l0 e-rest) (fold-line line0 line #f) ; expand
                     (let ((e-width (fmt-ja-width (reverse e-l0))))
                       (if (or (and (<= e-width fmt-ja-max-width)
                                    (<= (abs (- e-width fmt-ja-goal-width))
@@ -304,9 +297,7 @@
 (define (fmt-ja-char-list->line-list res char-list)
   (if (null? char-list)
     (reverse res)
-    (receive
-      (line rest)
-      (break (lambda (x) (string=? x "\n")) char-list)
+    (receive (line rest) (break (lambda (x) (string=? x "\n")) char-list)
       (fmt-ja-char-list->line-list (cons line res)
         (if (pair? rest)
           (cdr rest) ; drop first "\n"
