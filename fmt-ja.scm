@@ -69,7 +69,9 @@
 (define (fmt-ja-on-selection pc)
   (let ((str (fmt-ja-acquire-text pc 'selection)))
     (if (string? str)
-      (im-commit pc (fmt-ja-str str))
+      (let ((fmt-str (fmt-ja-str str)))
+        (if (not (string=? fmt-str str))
+          (im-commit pc str))) ; avoid to unselect if there is no change.
       (im-commit-raw pc))))
 
 (define (fmt-ja-on-clipboard pc)
