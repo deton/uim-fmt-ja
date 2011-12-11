@@ -94,7 +94,9 @@
 
 (define (fmt-ja-line-list src-lines)
   (fmt-ja-fold-lines '()
-    (reverse (fmt-ja-join-lines '() src-lines))
+    (if fmt-ja-fold-only
+      src-lines
+      (reverse (fmt-ja-join-lines '() src-lines)))
     #f))
 
 (define (fmt-ja-get-indent line)

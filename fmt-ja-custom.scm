@@ -9,14 +9,20 @@
 
 (define-custom 'fmt-ja-goal-width 70
   '(fmt-ja)
-  '(integer 0 65535)
+  '(integer 1 65535)
   (N_ "goal width")
   (N_ "long description will be here."))
 
 (define-custom 'fmt-ja-max-width 72
   '(fmt-ja)
-  '(integer 0 65535)
+  '(integer 1 65535)
   (N_ "max width")
+  (N_ "long description will be here."))
+
+(define-custom 'fmt-ja-fold-only #f
+  '(fmt-ja)
+  '(boolean)
+  (N_ "fold long lines only, do not join")
   (N_ "long description will be here."))
 
 (define (fmt-ja-iconv enc-to enc-from str)
