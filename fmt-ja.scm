@@ -80,11 +80,8 @@
 
 (define (fmt-ja-str str)
   (let* ((char-list (string-to-list str))
-         (src-lines
-          (fmt-ja-char-list->line-list '()
-            (reverse char-list)))
-         (res-lines
-          (fmt-ja-line-list '() src-lines))
+         (src-lines (fmt-ja-char-list->line-list '() (reverse char-list)))
+         (res-lines (fmt-ja-line-list src-lines))
          (res-char-list
           (append-map
             (lambda (line)
@@ -95,7 +92,7 @@
         (drop-right res-char-list 1)
         res-char-list))))
 
-(define (fmt-ja-line-list res-lines src-lines)
+(define (fmt-ja-line-list src-lines)
   (fmt-ja-fold-lines '()
     (reverse (fmt-ja-join-lines '() src-lines))
     #f))
@@ -103,13 +100,14 @@
 (define (fmt-ja-get-indent line)
   (take-while fmt-ja-str1-whitespace? line))
 
-;; lines->joined-lines
+;; lines->joined-lines (lines->paragraph-list)
 (define (fmt-ja-join-lines joined-lines src-lines)
   ;; join lines in a paragraph to one line
   (define (join-paragraph paragraph src-lines indent)
     (define (paragraph-end? next-line cur-indent)
       (or (null? next-line) ; empty line?
-          (not (equal? (fmt-ja-get-indent next-line) cur-indent))))
+          (and fmt-ja-new-paragraph-by-indent-change
+               (not (equal? (fmt-ja-get-indent next-line) cur-indent)))))
     (cond
       ((null? src-lines)
         (cons paragraph joined-lines))
@@ -199,6 +197,7 @@
     (let ((line0n (reverse line0)))
       (cond
         ;; width of line0 becomes larger than the goal by adding last char
+        ;; TODO: support goal and max width (Burasagari)
         ((> (fmt-ja-width line0n) fmt-ja-goal-width)
           (receive
             (l0 rest)
