@@ -100,7 +100,7 @@
     (if (string? str)
       (let ((fmt-str (fmt-ja-str str)))
         (if (not (string=? fmt-str str))
-          (im-commit pc str))) ; avoid to unselect if there is no change.
+          (im-commit pc fmt-str))) ; avoid to unselect if there is no change.
       (im-commit-raw pc))))
 
 (define (fmt-ja-on-clipboard pc)
@@ -242,7 +242,8 @@
           (receive (s-l0 s-rest) (fold-line line0 line #t) ; shrink
             (let ((s-width (fmt-ja-width (reverse s-l0))))
               (cond
-                ((= s-width fmt-ja-goal-width)
+                ((and (> s-width 0)
+                      (<= (abs (- fmt-ja-goal-width s-width)) 1))
                   (values (reverse s-l0) s-rest))
                 ((> fmt-ja-max-width fmt-ja-goal-width)
                   (receive (e-l0 e-rest) (fold-line line0 line #f) ; expand
@@ -277,10 +278,11 @@
     line))
 
 (define (fmt-ja-str1-wide? str1)
-  (let ((char (fmt-ja-euc-jp-string->char str1)))
+  (let* ((char (fmt-ja-euc-jp-string->char str1))
+         (i (and char (char->integer char))))
     (and char
-         ;; TODO: support HALFWIDTH KATAKANA
-         (>= (char->integer char) 128))))
+         (not (<= #x8ea1 i #x8edf)) ; halfwidth katakana
+         (>= i 128))))
 
 (define (fmt-ja-str1-whitespace? str1)
   (let ((char (fmt-ja-euc-jp-string->char str1)))
