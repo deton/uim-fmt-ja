@@ -1,15 +1,15 @@
 uim-fmt-ja
 ==========
 
-uim-fmt-jaはfmtコマンドのuim IM版です。
-セレクションやクリップボード内のテキストの整形を行います。
+uim-fmt-jaはfmtコマンドのuim IM版です。セレクションやクリップボード内
+のテキストの整形を行います。
 
 必要なもの
 ==========
 
-セレクションやクリップボード内のテキストを取得するため、
-uimのtext acquisition API(surrounding text API)を使うので、
-text acquisition APIに対応したブリッジ(以下)でのみ動作します。
+セレクションやクリップボード内のテキストを取得するため、uimのtext
+acquisition API(surrounding text API)を使うので、text acquisition API
+に対応したブリッジ(以下)でのみ動作します。
 
   * uim-gtk
   * uim-qt4
@@ -23,13 +23,11 @@ text acquisition APIに対応したブリッジ(以下)でのみ動作します�
 準備
 ====
 
-uim-pref-gtkやuim-pref-qt4を起動し、
-「全体設定」→「使用可能にする入力方式」を編集し、
-"fmt-ja"を有効にしてください。
+uim-pref-gtkやuim-pref-qt4を起動し、「全体設定」→「使用可能にする入力
+方式」を編集し、"fmt-ja"を有効にしてください。
 
-キーボードを使ってfmt-ja IMに切り替えるには、
-「ホットキーによる入力方式の一時切り替えを有効にする」を
-チェックしてください。
+キーボードを使ってfmt-ja IMに切り替えるには、「ホットキーによる入力方
+式の一時切り替えを有効にする」をチェックしてください。
 
 使用方法
 ========
