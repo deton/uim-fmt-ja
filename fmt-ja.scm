@@ -106,7 +106,8 @@
       (begin
         (if (> len 0)
           (im-delete-text pc 'primary 'cursor len 0))
-        (im-commit pc str)))))
+        (if (not (string=? str ""))
+          (im-commit pc str))))))
 
 (define (fmt-ja-acquire-text pc id)
   (and-let*
@@ -135,7 +136,7 @@
       (let* ((fmt-str-list (fmt-ja-str str))
              (fmt-str (apply string-append fmt-str-list)))
         (fmt-ja-context-set-undo-len! pc (length fmt-str-list))
-        (fmt-ja-context-set-undo-str! pc str)
+        (fmt-ja-context-set-undo-str! pc "")
         (im-commit pc fmt-str))
       (begin
         (fmt-ja-context-set-undo-str! pc #f)
