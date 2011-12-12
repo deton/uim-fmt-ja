@@ -37,7 +37,12 @@
 (set! fmt-ja-kinsoku-chars-on-end-internal
   (fmt-ja-utf8->eucjp fmt-ja-kinsoku-chars-on-end))
 
-(define fmt-ja-context-rec-spec context-rec-spec)
+(define fmt-ja-context-rec-spec
+  (append
+    context-rec-spec
+    (list
+      (list 'undo-len 0)
+      (list 'undo-str #f))))
 (define-record 'fmt-ja-context fmt-ja-context-rec-spec)
 (define fmt-ja-context-new-internal fmt-ja-context-new)
 
@@ -53,13 +58,19 @@
 
 (define (fmt-ja-key-press-handler pc key key-state)
   (if (ichar-control? key)
-    (im-commit-raw pc)
+    (begin
+      (fmt-ja-context-set-undo-str! pc #f)
+      (im-commit-raw pc))
     (cond
       ((fmt-ja-selection-key? key key-state)
         (fmt-ja-on-selection pc))
       ((fmt-ja-clipboard-key? key key-state)
         (fmt-ja-on-clipboard pc))
+      ((fmt-ja-undo-key? key key-state)
+        (fmt-ja-undo pc)
+        (fmt-ja-context-set-undo-str! pc #f))
       (else
+        (fmt-ja-context-set-undo-str! pc #f)
         (im-commit-raw pc)))))
 
 (define (fmt-ja-key-release-handler pc key state)
@@ -88,6 +99,15 @@
  #f
  )
 
+(define (fmt-ja-undo pc)
+  (let ((str (fmt-ja-context-undo-str pc))
+        (len (fmt-ja-context-undo-len pc)))
+    (if str
+      (begin
+        (if (> len 0)
+          (im-delete-text pc 'primary 'cursor len 0))
+        (im-commit pc str)))))
+
 (define (fmt-ja-acquire-text pc id)
   (and-let*
     ((ustr (im-acquire-text pc id 'beginning 0 'full))
@@ -98,16 +118,28 @@
 (define (fmt-ja-on-selection pc)
   (let ((str (fmt-ja-acquire-text pc 'selection)))
     (if (string? str)
-      (let ((fmt-str (fmt-ja-str str)))
-        (if (not (string=? fmt-str str))
-          (im-commit pc fmt-str))) ; avoid to unselect if there is no change.
-      (im-commit-raw pc))))
+      (let* ((fmt-str-list (fmt-ja-str str))
+             (fmt-str (apply string-append fmt-str-list)))
+        (if (not (string=? fmt-str str)) ; avoid to unselect on no change
+          (begin
+            (fmt-ja-context-set-undo-len! pc (length fmt-str-list))
+            (fmt-ja-context-set-undo-str! pc str)
+            (im-commit pc fmt-str))))
+      (begin
+        (fmt-ja-context-set-undo-str! pc #f)
+        (im-commit-raw pc)))))
 
 (define (fmt-ja-on-clipboard pc)
   (let ((str (fmt-ja-acquire-text pc 'clipboard)))
     (if (string? str)
-      (im-commit pc (fmt-ja-str str))
-      (im-commit-raw pc))))
+      (let* ((fmt-str-list (fmt-ja-str str))
+             (fmt-str (apply string-append fmt-str-list)))
+        (fmt-ja-context-set-undo-len! pc (length fmt-str-list))
+        (fmt-ja-context-set-undo-str! pc str)
+        (im-commit pc fmt-str))
+      (begin
+        (fmt-ja-context-set-undo-str! pc #f)
+        (im-commit-raw pc)))))
 
 (define (fmt-ja-str str)
   (let* ((char-list (string-to-list str))
@@ -118,10 +150,9 @@
             (lambda (line)
               (append line '("\n")))
             (reverse res-lines))))
-    (apply string-append
-      (if (not (string=? (car char-list) "\n")) ; str is not terminated with \n
-        (drop-right res-char-list 1)
-        res-char-list))))
+    (if (not (string=? (car char-list) "\n")) ; str is not terminated with \n
+      (drop-right res-char-list 1)
+      res-char-list)))
 
 (define (fmt-ja-line-list src-lines)
   (fmt-ja-fold-lines '()

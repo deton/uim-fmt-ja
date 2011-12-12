@@ -81,6 +81,12 @@
 	       (N_ "[fmt-ja] format clipboard")
 	       (N_ "long description will be here"))
 
+(define-custom 'fmt-ja-undo-key '("u")
+               '(fmt-ja)
+	       '(key)
+	       (N_ "[fmt-ja] undo last commit")
+	       (N_ "long description will be here"))
+
 (custom-add-hook 'fmt-ja-kinsoku-chars-on-start
   'custom-set-hooks
   (lambda ()
