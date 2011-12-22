@@ -69,6 +69,12 @@
   (N_ "new paragraph by indent change")
   (N_ "long description will be here."))
 
+(define-custom 'fmt-ja-switch-default-im-after-commit #f
+  '(fmt-ja)
+  '(boolean)
+  (N_ "switch to default IM after commit")
+  (N_ "long description will be here."))
+
 (define-custom 'fmt-ja-selection-key '("s")
                '(fmt-ja)
 	       '(key)
@@ -85,6 +91,12 @@
                '(fmt-ja)
 	       '(key)
 	       (N_ "[fmt-ja] undo last commit")
+	       (N_ "long description will be here"))
+
+(define-custom 'fmt-ja-switch-default-im-key '("<IgnoreShift>~")
+               '(fmt-ja)
+	       '(key)
+	       (N_ "[fmt-ja] switch to default IM")
 	       (N_ "long description will be here"))
 
 (custom-add-hook 'fmt-ja-kinsoku-chars-on-start

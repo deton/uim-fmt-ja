@@ -69,6 +69,8 @@
       ((fmt-ja-undo-key? key key-state)
         (fmt-ja-undo pc)
         (fmt-ja-context-set-undo-str! pc #f))
+      ((fmt-ja-switch-default-im-key? key key-state)
+        (im-switch-im pc default-im-name))
       (else
         (fmt-ja-context-set-undo-str! pc #f)
         (im-commit-raw pc)))))
@@ -125,7 +127,9 @@
           (begin
             (fmt-ja-context-set-undo-len! pc (length fmt-str-list))
             (fmt-ja-context-set-undo-str! pc str)
-            (im-commit pc fmt-str))))
+            (im-commit pc fmt-str)))
+        (if fmt-ja-switch-default-im-after-commit
+          (im-switch-im pc default-im-name)))
       (begin
         (fmt-ja-context-set-undo-str! pc #f)
         (im-commit-raw pc)))))
@@ -137,7 +141,9 @@
              (fmt-str (apply string-append fmt-str-list)))
         (fmt-ja-context-set-undo-len! pc (length fmt-str-list))
         (fmt-ja-context-set-undo-str! pc "")
-        (im-commit pc fmt-str))
+        (im-commit pc fmt-str)
+        (if fmt-ja-switch-default-im-after-commit
+          (im-switch-im pc default-im-name)))
       (begin
         (fmt-ja-context-set-undo-str! pc #f)
         (im-commit-raw pc)))))
