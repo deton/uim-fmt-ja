@@ -1,8 +1,8 @@
 uim-fmt-ja
 ==========
 
-uim-fmt-jaはfmtコマンドの[uim](http://code.google.com/p/uim/) IM版です。セレクションやクリップボード内
-のテキストの整形を行います。
+uim-fmt-jaはfmtコマンドの[uim](http://code.google.com/p/uim/) IM版です。
+セレクションやクリップボード内のテキストの整形を行います。
 
 必要なもの
 ==========
