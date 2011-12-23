@@ -38,7 +38,7 @@
   (fmt-ja-iconv "EUC-JP" "UTF-8" utf8-str))
 
 (define fmt-ja-kinsoku-chars-on-start-internal
-  "¡¼¡Ý¡Á¡¢¡£¡¤¡¥¡§¡¨¡©¡ª¡«¡¬¡ë¡ì¡í¡î¡ñ¢ó¡³¡´¡µ¡¶¡Ä¡Å¡¹¡¾¡¦­á¡Ç¡É¡Ë¡Í¡Ï¡Ñ¡Ó¡Õ¡×¡Ù¡Û¤¡¤£¤¥¤§¤©¤Ã¤ã¤å¤ç¤î¥¡¥£¥¥¥§¥©¥Ã¥ã¥å¥ç¥î¥õ¥ö.,:;!?>)}]-")
+  "¡¼¡Ý¡Á¡¢¡£¡¤¡¥¡§¡¨¡©¡ª¡«¡¬¡ë¡ì¡í¡î¡ñ¢ó¡³¡´¡µ¡¶¡Ä¡Å¡¹¡¾¡¦¡Ç¡É¡Ë¡Í¡Ï¡Ñ¡Ó¡Õ¡×¡Ù¡Û¤¡¤£¤¥¤§¤©¤Ã¤ã¤å¤ç¤î¥¡¥£¥¥¥§¥©¥Ã¥ã¥å¥ç¥î¥õ¥ö.,:;!?>)}]-")
 
 (define-custom 'fmt-ja-kinsoku-chars-on-start
   (fmt-ja-eucjp->utf8 fmt-ja-kinsoku-chars-on-start-internal)
@@ -48,7 +48,7 @@
   (N_ "long description will be here."))
 
 (define fmt-ja-kinsoku-chars-on-end-internal
-  "­à¡Æ¡È¡Ê¡Ì¡Î¡Ð¡Ò¡Ô¡Ö¡Ø¡Ú<({[")
+  "¡Æ¡È¡Ê¡Ì¡Î¡Ð¡Ò¡Ô¡Ö¡Ø¡Ú<({[")
 
 (define-custom 'fmt-ja-kinsoku-chars-on-end
   (fmt-ja-eucjp->utf8 fmt-ja-kinsoku-chars-on-end-internal)
