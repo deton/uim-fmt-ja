@@ -9,10 +9,10 @@ uim-fmt-jaはfmtコマンドのuim IM版です。セレクションやクリッ�
 
 セレクションやクリップボード内のテキストを取得するため、uimのtext
 acquisition API(surrounding text API)を使うので、text acquisition API
-に対応したブリッジ(以下)でのみ動作します。
+に対応した以下のブリッジでのみ動作します。
 
   * uim-gtk
-  * uim-qt4
+  * uim-qt4 (uim-1.7.1ではlineeditのみ対応。textedit対応はtrunk r7266以降)
   * uim-qt3
 
 インストール
@@ -40,6 +40,7 @@ uim-toolbarや「一時切り替えキー」を使って、fmt-ja IMに切り替
 s    セレクションを整形
 S    クリップボード内の文字列を整形して貼り付け
 u    直前の整形を取り消し(入力エリア側にアンドゥ機能が無い場合用)
+~    デフォルトのIMに切り替える
 
 コマンドライン用スクリプト
 ==========================
