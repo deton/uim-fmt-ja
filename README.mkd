@@ -7,6 +7,8 @@ uim-fmt-jaはfmtコマンドの[uim](http://code.google.com/p/uim/) IM版です�
 必要なもの
 ==========
 
+  * uim trunk r7271以降
+
 セレクションやクリップボード内のテキストを取得するため、uimのtext
 acquisition API(surrounding text API)を使うので、text acquisition API
 に対応した以下のブリッジでのみ動作します。
@@ -68,6 +70,14 @@ uim-toolbarや「一時切り替えキー」を使って、fmt-ja IM
 使用例:
 
     % tools/uim-fmt-ja.sh file >out
+
+関連
+====
+
+* uim-external-filter https://github.com/deton/uim-external-filter
+* uim-japan-util https://github.com/deton/uim-japan-util
+* uim-wordcount https://github.com/deton/uim-wordcount
+* uim-external-editor https://github.com/deton/uim-external-editor
 
 参考
 ====
